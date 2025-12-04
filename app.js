@@ -80,6 +80,86 @@ function createResultCard(result) {
     
     const profitClass = result.profit >= 0 ? 'positive' : 'negative';
     
+    // Create trade history HTML if available
+    let tradeHistoryHTML = '';
+    if (result.tradeHistory && result.tradeHistory.length > 0) {
+        // Calculate trade statistics
+        const buyTrades = result.tradeHistory.filter(t => t.action === 'buy');
+        const sellTrades = result.tradeHistory.filter(t => t.action === 'sell');
+        const avgBuyPrice = buyTrades.length > 0 
+            ? buyTrades.reduce((sum, t) => sum + t.price, 0) / buyTrades.length 
+            : 0;
+        const avgSellPrice = sellTrades.length > 0 
+            ? sellTrades.reduce((sum, t) => sum + t.price, 0) / sellTrades.length 
+            : 0;
+        
+        const tradeRows = result.tradeHistory.map(trade => {
+            const actionClass = trade.action === 'buy' ? 'buy-action' : 'sell-action';
+            const actionText = trade.action === 'buy' ? '买入' : '卖出';
+            return `
+                <tr>
+                    <td>${trade.date}</td>
+                    <td><span class="trade-action ${actionClass}">${actionText}</span></td>
+                    <td>${formatCurrency(trade.price)}</td>
+                    <td>${formatNumber(trade.btcAmount, 6)} BTC</td>
+                    <td>${formatCurrency(trade.usdAmount)}</td>
+                    <td>${formatCurrency(trade.portfolioValue)}</td>
+                    <td class="trade-reason">${trade.reason}</td>
+                </tr>
+            `;
+        }).join('');
+        
+        const statsHTML = `
+            <div class="trade-stats">
+                <div class="trade-stat-item">
+                    <span class="stat-label">买入次数</span>
+                    <span class="stat-value buy-stat">${buyTrades.length}</span>
+                </div>
+                <div class="trade-stat-item">
+                    <span class="stat-label">卖出次数</span>
+                    <span class="stat-value sell-stat">${sellTrades.length}</span>
+                </div>
+                <div class="trade-stat-item">
+                    <span class="stat-label">平均买入价</span>
+                    <span class="stat-value">${avgBuyPrice > 0 ? formatCurrency(avgBuyPrice) : 'N/A'}</span>
+                </div>
+                <div class="trade-stat-item">
+                    <span class="stat-label">平均卖出价</span>
+                    <span class="stat-value">${avgSellPrice > 0 ? formatCurrency(avgSellPrice) : 'N/A'}</span>
+                </div>
+            </div>
+        `;
+        
+        tradeHistoryHTML = `
+            <div class="trade-history-section">
+                <button class="toggle-trades-btn" onclick="toggleTradeHistory(this)">
+                    📊 查看交易历史 (${result.tradeHistory.length} 笔交易)
+                </button>
+                <div class="trade-history-content" style="display: none;">
+                    ${statsHTML}
+                    <div class="trade-history-table-wrapper">
+                        <table class="trade-history-table">
+                            <thead>
+                                <tr>
+                                    <th>日期</th>
+                                    <th>操作</th>
+                                    <th>价格</th>
+                                    <th>数量</th>
+                                    <th>金额</th>
+                                    <th>组合价值</th>
+                                    <th>原因</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${tradeRows}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+    
     card.innerHTML = `
         <div class="result-strategy-name">${result.name}</div>
         <div class="result-metrics">
@@ -109,9 +189,21 @@ function createResultCard(result) {
             </div>
         </div>
         <p style="margin-top: 12px; color: var(--text-secondary); font-size: 0.9rem;">${result.description}</p>
+        ${tradeHistoryHTML}
     `;
     
     return card;
+}
+
+function toggleTradeHistory(button) {
+    const content = button.nextElementSibling;
+    if (content.style.display === 'none') {
+        content.style.display = 'block';
+        button.textContent = button.textContent.replace('查看', '隐藏');
+    } else {
+        content.style.display = 'none';
+        button.textContent = button.textContent.replace('隐藏', '查看');
+    }
 }
 
 function createPortfolioChart(results) {
@@ -132,20 +224,75 @@ function createPortfolioChart(results) {
         '#ec4899'
     ];
     
-    const datasets = results.map((result, index) => ({
-        label: result.name,
-        data: result.history.map(h => ({
-            x: h.date,
-            y: h.value
-        })),
-        borderColor: colors[index % colors.length],
-        backgroundColor: colors[index % colors.length] + '20',
-        borderWidth: 2,
-        fill: false,
-        tension: 0.4,
-        pointRadius: 0,
-        pointHoverRadius: 4
-    }));
+    const datasets = [];
+    
+    results.forEach((result, index) => {
+        const color = colors[index % colors.length];
+        
+        // Main portfolio value line
+        datasets.push({
+            label: result.name,
+            data: result.history.map(h => ({
+                x: h.date,
+                y: h.value
+            })),
+            borderColor: color,
+            backgroundColor: color + '20',
+            borderWidth: 2,
+            fill: false,
+            tension: 0.4,
+            pointRadius: 0,
+            pointHoverRadius: 4,
+            order: 1
+        });
+        
+        // Add trade markers if available
+        if (result.tradeHistory && result.tradeHistory.length > 0) {
+            const buyTrades = result.tradeHistory
+                .filter(t => t.action === 'buy')
+                .map(t => ({
+                    x: t.date,
+                    y: t.portfolioValue
+                }));
+            
+            const sellTrades = result.tradeHistory
+                .filter(t => t.action === 'sell')
+                .map(t => ({
+                    x: t.date,
+                    y: t.portfolioValue
+                }));
+            
+            // Buy markers
+            if (buyTrades.length > 0) {
+                datasets.push({
+                    label: result.name + ' (买入)',
+                    data: buyTrades,
+                    borderColor: '#10b981',
+                    backgroundColor: '#10b981',
+                    pointRadius: 6,
+                    pointHoverRadius: 8,
+                    pointStyle: 'triangle',
+                    showLine: false,
+                    order: 0
+                });
+            }
+            
+            // Sell markers
+            if (sellTrades.length > 0) {
+                datasets.push({
+                    label: result.name + ' (卖出)',
+                    data: sellTrades,
+                    borderColor: '#ef4444',
+                    backgroundColor: '#ef4444',
+                    pointRadius: 6,
+                    pointHoverRadius: 8,
+                    pointStyle: 'rectRot',
+                    showLine: false,
+                    order: 0
+                });
+            }
+        }
+    });
     
     portfolioChart = new Chart(ctx, {
         type: 'line',
@@ -164,10 +311,14 @@ function createPortfolioChart(results) {
                     labels: {
                         color: '#ffffff',
                         font: {
-                            size: 12
+                            size: 11
                         },
-                        padding: 15,
-                        usePointStyle: true
+                        padding: 10,
+                        usePointStyle: true,
+                        filter: function(item) {
+                            // Only show main strategy lines in legend, not individual trade markers
+                            return !item.text.includes('(买入)') && !item.text.includes('(卖出)');
+                        }
                     }
                 },
                 tooltip: {
@@ -180,7 +331,11 @@ function createPortfolioChart(results) {
                     displayColors: true,
                     callbacks: {
                         label: function(context) {
-                            return context.dataset.label + ': ' + formatCurrency(context.parsed.y);
+                            const label = context.dataset.label || '';
+                            if (label.includes('(买入)') || label.includes('(卖出)')) {
+                                return label + ': ' + formatCurrency(context.parsed.y);
+                            }
+                            return label + ': ' + formatCurrency(context.parsed.y);
                         }
                     }
                 }
