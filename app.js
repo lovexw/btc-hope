@@ -101,7 +101,7 @@ function createResultCard(result) {
                     <td>${trade.date}</td>
                     <td><span class="trade-action ${actionClass}">${actionText}</span></td>
                     <td>${formatCurrency(trade.price)}</td>
-                    <td>${formatNumber(trade.btcAmount, 6)} BTC</td>
+                    <td>${formatNumber(trade.btcAmount, 6)}</td>
                     <td>${formatCurrency(trade.usdAmount)}</td>
                     <td>${formatCurrency(trade.portfolioValue)}</td>
                     <td class="trade-reason">${trade.reason}</td>
@@ -172,7 +172,6 @@ function createResultCard(result) {
                     <span class="trade-summary">共 ${result.tradeHistory.length} 笔交易 | 买入 ${buyTrades.length} 次 | 卖出 ${sellTrades.length} 次</span>
                 </div>
                 ${statsHTML}
-                <div class="scroll-hint">← 左右滑动查看完整信息 →</div>
                 <div class="trade-history-table-wrapper">
                     <table class="trade-history-table">
                         <thead>
@@ -199,36 +198,70 @@ function createResultCard(result) {
     }
     
     card.innerHTML = `
-        <div class="result-strategy-name">${result.name}</div>
-        <div class="result-metrics">
-            <div class="result-metric">
-                <span class="result-metric-label">初始投资</span>
-                <span class="result-metric-value">${formatCurrency(result.totalInvested)}</span>
+        <div class="result-card-header">
+            <div class="result-strategy-info">
+                <h3 class="result-strategy-name">${result.strategy}</h3>
+                <span class="expand-icon">▼</span>
             </div>
-            <div class="result-metric">
-                <span class="result-metric-label">最终价值</span>
-                <span class="result-metric-value ${profitClass}">${formatCurrency(result.finalValue)}</span>
-            </div>
-            <div class="result-metric">
-                <span class="result-metric-label">收益金额</span>
-                <span class="result-metric-value ${profitClass}">${formatCurrency(result.profit)}</span>
-            </div>
-            <div class="result-metric">
-                <span class="result-metric-label">收益率</span>
-                <span class="result-metric-value ${profitClass}">${formatPercent(result.profitPercent)}</span>
-            </div>
-            <div class="result-metric">
-                <span class="result-metric-label">持有BTC</span>
-                <span class="result-metric-value">${formatNumber(result.btcAmount, 4)}</span>
-            </div>
-            <div class="result-metric">
-                <span class="result-metric-label">交易次数</span>
-                <span class="result-metric-value">${result.trades}</span>
+            <div class="result-card-summary">
+                <div class="summary-metric">
+                    <div class="summary-label">总收益</div>
+                    <div class="summary-value ${profitClass}">${formatPercent(result.profit)}</div>
+                </div>
+                <div class="summary-metric">
+                    <div class="summary-label">年化收益</div>
+                    <div class="summary-value ${profitClass}">${formatPercent(result.annualizedReturn)}</div>
+                </div>
+                <div class="summary-metric">
+                    <div class="summary-label">最终价值</div>
+                    <div class="summary-value">${formatCurrency(result.finalValue)}</div>
+                </div>
             </div>
         </div>
-        <p style="margin-top: 12px; color: var(--text-secondary); font-size: 0.9rem;">${result.description}</p>
-        ${tradeHistoryHTML}
+        <div class="result-card-content">
+            <div class="result-metrics">
+                <div class="result-metric">
+                    <span class="result-metric-label">初始投资</span>
+                    <span class="result-metric-value">${formatCurrency(result.initialInvestment)}</span>
+                </div>
+                <div class="result-metric">
+                    <span class="result-metric-label">最终价值</span>
+                    <span class="result-metric-value">${formatCurrency(result.finalValue)}</span>
+                </div>
+                <div class="result-metric">
+                    <span class="result-metric-label">总收益</span>
+                    <span class="result-metric-value ${profitClass}">${formatCurrency(result.finalValue - result.initialInvestment)}</span>
+                </div>
+                <div class="result-metric">
+                    <span class="result-metric-label">收益率</span>
+                    <span class="result-metric-value ${profitClass}">${formatPercent(result.profit)}</span>
+                </div>
+                <div class="result-metric">
+                    <span class="result-metric-label">年化收益率</span>
+                    <span class="result-metric-value ${profitClass}">${formatPercent(result.annualizedReturn)}</span>
+                </div>
+                <div class="result-metric">
+                    <span class="result-metric-label">最大回撤</span>
+                    <span class="result-metric-value negative">${formatPercent(result.maxDrawdown)}</span>
+                </div>
+                <div class="result-metric">
+                    <span class="result-metric-label">夏普比率</span>
+                    <span class="result-metric-value">${result.sharpeRatio ? result.sharpeRatio.toFixed(2) : 'N/A'}</span>
+                </div>
+                <div class="result-metric">
+                    <span class="result-metric-label">总交易次数</span>
+                    <span class="result-metric-value">${result.totalTrades || 0}</span>
+                </div>
+            </div>
+            ${tradeHistoryHTML}
+        </div>
     `;
+    
+    // Add click event to toggle expansion
+    const header = card.querySelector('.result-card-header');
+    header.addEventListener('click', () => {
+        card.classList.toggle('expanded');
+    });
     
     return card;
 }
