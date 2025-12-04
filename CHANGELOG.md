@@ -1,153 +1,88 @@
-# Changelog
+# 更新日志 / Changelog
 
-## [Bugfix] Chart.js Canvas, Date Adapter, and Strategy Descriptions - 2024-12-04
+## [2024-01-XX] - 交易历史追踪功能
 
-### 🐛 Bug Fixes
+### 🆕 新增功能
 
-#### 1. Fixed Canvas Reuse Error
-**Issue:** Multiple Chart.js canvas reuse errors when running backtest calculations repeatedly.
+#### 1. 完整交易历史记录
+每个投资策略现在都会记录所有交易的详细信息：
 
-**Error Message:**
-```
-Canvas is already in use. Chart with ID '0' must be destroyed before the canvas with ID 'portfolioChart' can be reused.
-```
+- **交易数据**：
+  - 交易日期
+  - 操作类型（买入/卖出）
+  - 交易价格
+  - 交易数量（BTC）
+  - 交易金额（USD）
+  - 交易后的组合价值
+  - 交易原因说明
 
-**Solution:**
-- Updated `createPortfolioChart()` function in `app.js` (lines 120-124)
-- Updated `createPriceChart()` function in `app.js` (lines 224-227)
-- Added proper cleanup: `chart.destroy(); chart = null;`
-- Ensures canvas element is fully released before creating new chart instance
+#### 2. 可视化交易标记
+在资产增长曲线图表上添加了交易点标记：
 
-**Files Changed:**
-- `app.js`: Added `portfolioChart = null` after destroy
-- `app.js`: Added `priceChart = null` after destroy
+- 🔺 **绿色三角** = 买入点
+- 🔶 **红色菱形** = 卖出点
+- 鼠标悬停可查看交易详情
 
-#### 2. Fixed Date Adapter Missing Error
-**Issue:** Chart.js 4.x requires a date adapter for time-based scales, which was not included.
+#### 3. 交易历史表格
+每个策略卡片新增可展开的交易历史部分：
 
-**Error Message:**
-```
-This method is not implemented: Check that a complete date adapter is provided.
-```
+- **交易统计摘要**：
+  - 买入次数
+  - 卖出次数
+  - 平均买入价
+  - 平均卖出价
 
-**Solution:**
-- Added `chartjs-adapter-date-fns@3.0.0` bundle to `index.html`
-- This provides date parsing, formatting, and manipulation for Chart.js
-- Bundle version includes date-fns library (no additional dependencies needed)
+- **详细交易表格**：
+  - 完整的交易时间线
+  - 每笔交易的具体信息
+  - 交易触发原因说明
 
-**Files Changed:**
-- `index.html`: Added script tag for date adapter (line 10)
+#### 4. 策略交易原因说明
+不同策略有针对性的交易原因描述：
 
-**CDN Used:**
-```html
-<script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3.0.0/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
-```
+- **HODL 策略**：`初始买入`
+- **定投策略**：`月度定投`
+- **高抛策略**：`价格上涨 35.2%，卖出 50% 止盈`
+- **低吸策略**：`价格从高点回落 23.5%，抄底买入`
+- **网格交易**：`网格买入：价格下跌 10.5%` / `网格卖出：价格上涨 12.3%`
+- **均线交叉**：`金叉信号：7日均线上穿30日均线` / `死叉信号：7日均线下穿30日均线`
 
-### ✨ Enhancements
+### 💡 使用价值
 
-#### 3. Added Detailed Strategy Descriptions
-**Issue:** Strategy descriptions were too brief (one sentence), users couldn't understand how strategies work or generate profit.
+这个功能让用户能够：
 
-**Solution:**
-Added comprehensive descriptions for all 6 strategies with:
-- 📍 **Strategy Logic**: Detailed explanation of how the strategy operates
-- 💰 **Profit Mechanism**: Clear explanation of how it generates returns
-- **Use Cases**: Best market conditions and investor types
+1. **理解策略操作**：清楚看到策略在不同市场环境下如何操作
+2. **学习买入时机**：通过历史数据学习最佳入场时机
+3. **分析高胜率策略**：研究成功策略在历史跌幅中的具体操作
+4. **验证收益来源**：了解收益是如何通过具体交易实现的
+5. **制定投资计划**：基于历史交易模式制定自己的投资策略
 
-**Descriptions Added:**
+### 🎨 UI/UX 改进
 
-1. **HODL 持有策略**
-   - One-time purchase and hold strategy
-   - Profit from long-term price appreciation
-   - Ideal for long-term Bitcoin believers
+- 新增图表说明框，解释买入/卖出标记
+- 优化表格样式，提高可读性
+- 添加平滑展开/收起动画
+- 响应式设计适配移动端
+- 颜色编码清晰区分买入/卖出操作
 
-2. **定投策略 (DCA)**
-   - Monthly fixed investment ($500 by default)
-   - Cost averaging reduces timing risk
-   - Perfect for salary workers doing long-term investing
+### 📝 技术实现
 
-3. **高抛策略 (Sell High)**
-   - Sell 50% when price rises 30% from purchase
-   - Lock in profits during rallies
-   - Best for volatile bull markets
+- 所有6个策略都实现了完整的交易历史追踪
+- 在图表上使用 Chart.js 的 scatter 点集展示交易标记
+- 使用 CSS Grid 布局交易统计卡片
+- 可展开/折叠的交易历史表格
 
-4. **低吸策略 (Buy Dip)**
-   - Buy when price drops 20% from historical high
-   - Accumulate at lower prices during panic
-   - "Be greedy when others are fearful" approach
+### 📚 文档更新
 
-5. **网格交易 (Grid Trading)**
-   - 50/50 cash/BTC split with 10% grid intervals
-   - Profit from price oscillation through frequent trading
-   - Excellent for ranging/choppy markets
+- 更新了 `README.md` 说明新功能
+- 更新了 `FEATURES.md` 详细介绍交易历史功能
+- 在页面上添加了图表说明
 
-6. **均线交叉 (MA Cross)**
-   - 7-day and 30-day moving average crossover signals
-   - Golden cross (buy) / Death cross (sell)
-   - Effective in trending markets, less so in choppy conditions
+---
 
-**Files Changed:**
-- `strategies.js`: Updated all 6 strategy return objects with detailed descriptions
+## 未来计划
 
-### 📊 Technical Details
-
-**Chart.js Setup:**
-- Chart.js version: 4.4.0
-- Date adapter: chartjs-adapter-date-fns 3.0.0 (bundle)
-- Time scale format: 'MMM yyyy' (e.g., "Jan 2020")
-- Logarithmic scale for price chart
-- Linear scale for portfolio chart
-
-**Code Quality:**
-- Added explanatory comments for chart cleanup
-- Proper resource management to prevent memory leaks
-- All emoji icons render correctly across browsers
-
-### 📈 Impact
-
-**Before:**
-- ❌ Canvas reuse errors when calculating multiple times
-- ❌ Date adapter errors preventing charts from rendering
-- ❌ Brief, uninformative strategy descriptions
-
-**After:**
-- ✅ Can run calculations repeatedly without errors
-- ✅ Charts render perfectly with proper date formatting
-- ✅ Users understand each strategy's logic and profit mechanism
-- ✅ Improved user experience and educational value
-
-### 🧪 Testing
-
-See `TESTING.md` for comprehensive testing guide covering:
-1. Canvas reuse testing (multiple calculations)
-2. Date adapter verification (chart rendering)
-3. Strategy description validation (all 6 strategies)
-4. Full integration testing
-5. Mobile/responsive testing
-
-### 📝 Statistics
-
-**Files Modified:** 3
-- `index.html`: 1 line added
-- `app.js`: 4 lines added (2 locations)
-- `strategies.js`: 12 lines modified (6 strategy descriptions)
-
-**Total Lines Changed:** 17 lines
-**Bugs Fixed:** 2 critical errors
-**Enhancements:** 1 major UX improvement
-
-### 🔗 Related Documentation
-
-- `BUGFIX_SUMMARY.md`: Detailed technical analysis of fixes
-- `TESTING.md`: Comprehensive testing procedures
-- `FEATURES.md`: Updated feature list
-
-### 🙏 Notes
-
-This fix addresses user feedback about console errors when clicking the calculate button multiple times, and significantly improves the educational value of the strategy comparison tool by providing detailed explanations of each investment strategy.
-
-All changes are backward compatible and don't affect:
-- Calculation accuracy
-- Data structures
-- Visual design
-- Existing functionality
+- [ ] 添加交易筛选功能（只看买入/卖出）
+- [ ] 导出交易历史为 CSV
+- [ ] 交易时间分析（最佳买入月份/日期统计）
+- [ ] 交易胜率分析
