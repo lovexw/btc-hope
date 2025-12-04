@@ -167,33 +167,32 @@ function createResultCard(result) {
         
         tradeHistoryHTML = `
             <div class="trade-history-section">
-                <button class="toggle-trades-btn" onclick="toggleTradeHistory(this)">
-                    📊 查看交易历史 (${result.tradeHistory.length} 笔交易)
-                </button>
-                <div class="trade-history-content" style="display: none;">
-                    ${statsHTML}
-                    <div class="scroll-hint">← 左右滑动查看完整信息 →</div>
-                    <div class="trade-history-table-wrapper">
-                        <table class="trade-history-table">
-                            <thead>
-                                <tr>
-                                    <th>日期</th>
-                                    <th>操作</th>
-                                    <th>价格</th>
-                                    <th>数量</th>
-                                    <th>金额</th>
-                                    <th>组合价值</th>
-                                    <th>原因</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                ${tradeRows}
-                            </tbody>
-                        </table>
-                    </div>
-                    <div class="trade-history-mobile">
-                        ${mobileCards}
-                    </div>
+                <div class="trade-history-header">
+                    <h4>📊 交易历史记录</h4>
+                    <span class="trade-summary">共 ${result.tradeHistory.length} 笔交易 | 买入 ${buyTrades.length} 次 | 卖出 ${sellTrades.length} 次</span>
+                </div>
+                ${statsHTML}
+                <div class="scroll-hint">← 左右滑动查看完整信息 →</div>
+                <div class="trade-history-table-wrapper">
+                    <table class="trade-history-table">
+                        <thead>
+                            <tr>
+                                <th>日期</th>
+                                <th>操作</th>
+                                <th>价格</th>
+                                <th>数量</th>
+                                <th>金额</th>
+                                <th>组合价值</th>
+                                <th>原因</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${tradeRows}
+                        </tbody>
+                    </table>
+                </div>
+                <div class="trade-history-mobile">
+                    ${mobileCards}
                 </div>
             </div>
         `;
@@ -232,17 +231,6 @@ function createResultCard(result) {
     `;
     
     return card;
-}
-
-function toggleTradeHistory(button) {
-    const content = button.nextElementSibling;
-    if (content.style.display === 'none') {
-        content.style.display = 'block';
-        button.textContent = button.textContent.replace('查看', '隐藏');
-    } else {
-        content.style.display = 'none';
-        button.textContent = button.textContent.replace('隐藏', '查看');
-    }
 }
 
 function createPortfolioChart(results) {
