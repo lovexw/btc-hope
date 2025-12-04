@@ -1,0 +1,15 @@
+/*.csv
+  Content-Type: text/csv
+  Cache-Control: public, max-age=3600
+
+/*.js
+  Content-Type: application/javascript
+  Cache-Control: public, max-age=86400
+
+/*.css
+  Content-Type: text/css
+  Cache-Control: public, max-age=86400
+
+/*.html
+  Content-Type: text/html; charset=utf-8
+  Cache-Control: public, max-age=3600

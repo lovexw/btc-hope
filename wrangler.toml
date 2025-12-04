@@ -1,0 +1,5 @@
+name = "btc-strategy-backtest"
+compatibility_date = "2024-01-01"
+
+[site]
+bucket = "./"
