@@ -117,8 +117,10 @@ function createResultCard(result) {
 function createPortfolioChart(results) {
     const ctx = document.getElementById('portfolioChart');
     
+    // Properly destroy existing chart if it exists
     if (portfolioChart) {
         portfolioChart.destroy();
+        portfolioChart = null;
     }
     
     const colors = [
@@ -218,8 +220,10 @@ function createPortfolioChart(results) {
 function createPriceChart(data) {
     const ctx = document.getElementById('priceChart');
     
+    // Properly destroy existing chart if it exists
     if (priceChart) {
         priceChart.destroy();
+        priceChart = null;
     }
     
     const chartData = data.map(item => ({
