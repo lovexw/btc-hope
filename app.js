@@ -130,6 +130,41 @@ function createResultCard(result) {
             </div>
         `;
         
+        // Create mobile card view
+        const mobileCards = result.tradeHistory.map(trade => {
+            const actionClass = trade.action === 'buy' ? 'buy-action' : 'sell-action';
+            const actionText = trade.action === 'buy' ? '买入' : '卖出';
+            return `
+                <div class="trade-item-card">
+                    <div class="trade-item-header">
+                        <span class="trade-item-date">${trade.date}</span>
+                        <span class="trade-action ${actionClass}">${actionText}</span>
+                    </div>
+                    <div class="trade-item-details">
+                        <div class="trade-item-detail">
+                            <span class="trade-item-label">价格</span>
+                            <span class="trade-item-value">${formatCurrency(trade.price)}</span>
+                        </div>
+                        <div class="trade-item-detail">
+                            <span class="trade-item-label">数量</span>
+                            <span class="trade-item-value">${formatNumber(trade.btcAmount, 6)} BTC</span>
+                        </div>
+                        <div class="trade-item-detail">
+                            <span class="trade-item-label">金额</span>
+                            <span class="trade-item-value">${formatCurrency(trade.usdAmount)}</span>
+                        </div>
+                        <div class="trade-item-detail">
+                            <span class="trade-item-label">组合价值</span>
+                            <span class="trade-item-value">${formatCurrency(trade.portfolioValue)}</span>
+                        </div>
+                    </div>
+                    <div class="trade-item-reason">
+                        💡 ${trade.reason}
+                    </div>
+                </div>
+            `;
+        }).join('');
+        
         tradeHistoryHTML = `
             <div class="trade-history-section">
                 <button class="toggle-trades-btn" onclick="toggleTradeHistory(this)">
@@ -137,6 +172,7 @@ function createResultCard(result) {
                 </button>
                 <div class="trade-history-content" style="display: none;">
                     ${statsHTML}
+                    <div class="scroll-hint">← 左右滑动查看完整信息 →</div>
                     <div class="trade-history-table-wrapper">
                         <table class="trade-history-table">
                             <thead>
@@ -154,6 +190,9 @@ function createResultCard(result) {
                                 ${tradeRows}
                             </tbody>
                         </table>
+                    </div>
+                    <div class="trade-history-mobile">
+                        ${mobileCards}
                     </div>
                 </div>
             </div>
