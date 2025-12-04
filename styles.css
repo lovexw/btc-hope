@@ -343,20 +343,19 @@ body {
     100% { transform: rotate(360deg); }
 }
 
-/* 结果展示 */
+/* 结果展示 - 横排布局 */
 .results-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
 }
 
 .result-card {
     background: rgba(255, 255, 255, 0.03);
     border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: var(--border-radius-sm);
-    padding: 24px;
     transition: var(--transition);
-    margin-bottom: 20px;
+    overflow: hidden;
 }
 
 .result-card:hover {
@@ -365,14 +364,80 @@ body {
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
 }
 
+.result-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 24px;
+    cursor: pointer;
+    user-select: none;
+    transition: var(--transition);
+}
+
+.result-card-header:hover {
+    background: rgba(255, 255, 255, 0.02);
+}
+
+.result-strategy-info {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
 .result-strategy-name {
     font-size: 1.3rem;
     font-weight: 600;
-    margin-bottom: 20px;
     color: var(--text-primary);
+    margin: 0;
+}
+
+.expand-icon {
+    font-size: 1.2rem;
+    color: var(--text-secondary);
+    transition: var(--transition);
+}
+
+.result-card.expanded .expand-icon {
+    transform: rotate(180deg);
+}
+
+.result-card-summary {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 20px;
+}
+
+.summary-metric {
+    text-align: center;
+}
+
+.summary-label {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    margin-bottom: 4px;
+}
+
+.summary-value {
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+.summary-value.positive {
+    color: var(--success-color);
+}
+
+.summary-value.negative {
+    color: var(--danger-color);
+}
+
+.result-card-content {
+    display: none;
+    padding: 0 24px 24px;
+    animation: slideDown 0.3s ease-out;
+}
+
+.result-card.expanded .result-card-content {
+    display: block;
 }
 
 .result-metrics {
@@ -598,8 +663,6 @@ body {
 }
 
 .trade-history-table-wrapper {
-    position: relative;
-    overflow-x: auto;
     border-radius: var(--border-radius-sm);
     background: rgba(0, 0, 0, 0.2);
     border: 1px solid rgba(255, 255, 255, 0.1);
@@ -607,56 +670,8 @@ body {
     overflow-y: auto;
 }
 
-.trade-history-table-wrapper::before,
-.trade-history-table-wrapper::after {
-    content: '';
-    position: sticky;
-    display: block;
-    height: 10px;
-    z-index: 1;
-}
-
-.trade-history-table-wrapper::before {
-    top: 0;
-    background: linear-gradient(to bottom, rgba(0, 0, 0, 0.3), transparent);
-}
-
-.trade-history-table-wrapper::after {
-    bottom: 0;
-    background: linear-gradient(to top, rgba(0, 0, 0, 0.3), transparent);
-}
-
-.trade-history-table-wrapper::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
-}
-
-.trade-history-table-wrapper::-webkit-scrollbar-track {
-    background: rgba(0, 0, 0, 0.2);
-}
-
-.trade-history-table-wrapper::-webkit-scrollbar-thumb {
-    background: rgba(74, 144, 226, 0.5);
-    border-radius: 4px;
-}
-
-.trade-history-table-wrapper::-webkit-scrollbar-thumb:hover {
-    background: rgba(74, 144, 226, 0.7);
-}
-
-.scroll-hint {
-    text-align: center;
-    padding: 8px;
-    background: rgba(74, 144, 226, 0.1);
-    border-bottom: 1px solid rgba(74, 144, 226, 0.3);
-    color: var(--secondary-color);
-    font-size: 0.85rem;
-    font-weight: 500;
-}
-
 .trade-history-table {
     width: 100%;
-    min-width: 900px;
     border-collapse: collapse;
     font-size: 0.9rem;
 }
@@ -669,40 +684,29 @@ body {
 }
 
 .trade-history-table th {
-    padding: 14px 12px;
+    padding: 12px 8px;
     text-align: left;
     font-weight: 600;
     color: var(--text-secondary);
     border-bottom: 2px solid rgba(255, 255, 255, 0.2);
-    white-space: nowrap;
     background: rgba(255, 255, 255, 0.08);
-}
-
-.trade-history-table th:first-child {
-    padding-left: 16px;
-}
-
-.trade-history-table th:last-child {
-    padding-right: 16px;
+    font-size: 0.85rem;
 }
 
 .trade-history-table td {
-    padding: 12px 12px;
+    padding: 10px 8px;
     border-bottom: 1px solid rgba(255, 255, 255, 0.05);
     color: var(--text-primary);
-    white-space: nowrap;
+    font-size: 0.85rem;
 }
 
 .trade-history-table td:first-child {
-    padding-left: 16px;
+    padding-left: 12px;
     font-weight: 500;
 }
 
 .trade-history-table td:last-child {
-    padding-right: 16px;
-    white-space: normal;
-    min-width: 200px;
-    max-width: 300px;
+    padding-right: 12px;
 }
 
 .trade-history-table tbody tr {
@@ -742,8 +746,11 @@ body {
 .trade-reason {
     color: var(--text-secondary);
     font-style: italic;
-    font-size: 0.85rem;
-    line-height: 1.4;
+    font-size: 0.8rem;
+    line-height: 1.3;
+    max-width: 150px;
+    word-wrap: break-word;
+    white-space: normal;
 }
 
 /* 移动端交易历史卡片布局 */
@@ -931,19 +938,44 @@ body {
         grid-template-columns: 1fr;
     }
     
-    .result-card {
-        padding: 16px;
-        margin-bottom: 16px;
+    .result-card-header {
+        padding: 16px 20px;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
     }
     
-    .result-strategy-name {
-        font-size: 1.1rem;
-        margin-bottom: 16px;
+    .result-strategy-info {
+        width: 100%;
+        justify-content: space-between;
+    }
+    
+    .result-card-summary {
+        width: 100%;
+        justify-content: space-around;
+        gap: 12px;
+    }
+    
+    .summary-metric {
+        flex: 1;
+        text-align: center;
+    }
+    
+    .summary-label {
+        font-size: 0.75rem;
+    }
+    
+    .summary-value {
+        font-size: 0.9rem;
+    }
+    
+    .result-card-content {
+        padding: 0 20px 20px;
     }
     
     .result-metrics {
-        grid-template-columns: 1fr;
-        gap: 8px;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
         padding: 12px;
     }
     
