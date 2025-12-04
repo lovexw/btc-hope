@@ -40,7 +40,7 @@ class StrategyBacktest {
             btcAmount,
             history,
             trades: 1,
-            description: '一次性买入并持有到结束'
+            description: '📍 策略逻辑：在开始日期一次性投入全部资金购买比特币，然后持有到结束日期，期间不做任何操作。💰 获利方式：完全依靠比特币价格上涨获利，适合长期看好比特币的投资者。这是最简单也是最经典的策略，历史数据显示长期持有往往能获得可观收益。'
         };
     }
 
@@ -86,7 +86,7 @@ class StrategyBacktest {
             btcAmount,
             history,
             trades,
-            description: `每月定投 $${this.dcaAmount.toFixed(0)}`
+            description: `📍 策略逻辑：初始投入后，每月固定时间投入 ${this.dcaAmount.toFixed(0)}（无论价格高低）继续购买比特币，通过时间分散降低市场波动风险。💰 获利方式：通过定期买入平滑成本，降低一次性投资的择时风险。在熊市时能以较低价格积累更多币，在牛市时享受持续上涨带来的收益。适合工薪族长期定投，无需择时。`
         };
     }
 
@@ -136,7 +136,7 @@ class StrategyBacktest {
             cash,
             history,
             trades,
-            description: `涨幅 ${sellThreshold * 100}% 时卖出 ${sellPercentage * 100}%`
+            description: `📍 策略逻辑：初始买入后，当价格相比上次买入价上涨 ${sellThreshold * 100}% 时，自动卖出 ${sellPercentage * 100}% 的持仓锁定部分利润，然后继续持有剩余部分。💰 获利方式：在价格大幅上涨时及时止盈，将部分利润转为现金，避免后续回调时收益全部回吐。适合波动较大的牛市行情，既能享受上涨收益，又能锁定部分利润降低风险。`
         };
     }
 
@@ -191,7 +191,7 @@ class StrategyBacktest {
             cash,
             history,
             trades,
-            description: `跌幅 ${dipThreshold * 100}% 时买入 ${buyPercentage * 100}% 仓位`
+            description: `📍 策略逻辑：开始时持有全部现金，当价格从历史高点回落超过 ${dipThreshold * 100}% 时（即出现明显回调），使用 ${buyPercentage * 100}% 的可用现金抄底买入，等待反弹。💰 获利方式：在恐慌性下跌时勇敢买入，以更低的价格积累筹码，待价格反弹后获得收益。这是典型的"别人恐惧我贪婪"策略，适合有一定风险承受能力且能把握市场恐慌时机的投资者。`
         };
     }
 
@@ -248,7 +248,7 @@ class StrategyBacktest {
             cash,
             history,
             trades,
-            description: `涨跌 ${gridPercentage * 100}% 时交易 ${tradePercentage * 100}% 仓位`
+            description: `📍 策略逻辑：初始时一半现金、一半比特币持仓，设定 ${gridPercentage * 100}% 的价格网格。价格每上涨 ${gridPercentage * 100}% 就卖出 ${tradePercentage * 100}% 持仓；价格每下跌 ${gridPercentage * 100}% 就买入相应金额。💰 获利方式：通过高抛低吸赚取价格波动的差价，不预测趋势，只赚取震荡收益。交易频率高，适合波动较大的横盘或震荡市场，能够充分利用价格来回波动赚取利润。`
         };
     }
 
@@ -308,7 +308,7 @@ class StrategyBacktest {
             cash,
             history,
             trades,
-            description: `${shortPeriod}日均线与${longPeriod}日均线交叉策略`
+            description: `📍 策略逻辑：开始时持有全部现金，使用 ${shortPeriod} 日短期均线和 ${longPeriod} 日长期均线判断趋势。当短期均线上穿长期均线（金叉）时全仓买入，当短期均线下穿长期均线（死叉）时全部卖出。💰 获利方式：通过均线交叉捕捉中长期趋势，在上涨趋势中持有获利，在下跌趋势中空仓避险。适合趋势明显的单边市场，能够有效避开大级别回调，但在震荡市可能频繁交易产生损耗。`
         };
     }
 
